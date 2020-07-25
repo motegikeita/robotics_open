@@ -148,12 +148,20 @@ class Unicorn:
 		self.Current_speed = 0
 		return
 
+	# 一時停止（Current speedを維持したまま停止）
+	def pause(self, pause_time):
+		BP.set_motor_dps(self.drive, 0)
+		time.sleep(pause_time)
+		BP.set_motor_dps(self.drive, self.Current_speed)
+		return
+
 	# ステアリング
 	def steering(self, dir = CENTER, lr3_level = LR3_LEVER_RANGE):
 		if dir == self.CENTER:
 			pos = self.TO_CENTER
 		else:
 			pos = abs(lr3_level) / self.__LR3_step(self.TO_RIGHT * dir) + self.TO_CENTER
+		print('Steer %s' % self.Direction[dir])
 		BP.set_motor_position(self.steer, pos)
 		return
 
@@ -249,8 +257,7 @@ class Unicorn:
 		self.back()
 		self.steering(dir * -1)
 		self.move_and_see(self.TURN_INTERVAL)
-		self.stop()
-		time.sleep(self.STOP_INTERVAL)
+		self.pause(self.STOP_INTERVAL)
 		
 		# 正ハンドル
 		self.forward()
